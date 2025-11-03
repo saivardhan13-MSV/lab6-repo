@@ -53,7 +53,7 @@ jobs:
 
       - name: Terraform Plan (save binary)
         run: terraform plan -no-color -out=tfplan.bin
-
+        
       - name: Terraform Show → plan.txt (full)
         run: terraform show -no-color tfplan.bin | tee plan.txt
 
