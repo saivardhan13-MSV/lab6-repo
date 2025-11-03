@@ -12,15 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Print SHA
         run: echo "Commit SHA is $GITHUB_SHA"
-
       - name: Create hello file
         run: echo "run $GITHUB_RUN_ID" > hello-6837.txt
-
-      - name: Upload warmup artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: hello-6837
           path: hello-6837.txt
@@ -30,7 +26,7 @@ jobs:
     needs: warmup
     permissions:
       contents: read
-      id-token: write   # keep if you later add OIDC
+      id-token: write
     defaults:
       run:
         working-directory: ./terraform
@@ -53,7 +49,7 @@ jobs:
 
       - name: Terraform Plan (save binary)
         run: terraform plan -no-color -out=tfplan.bin
-        
+
       - name: Terraform Show → plan.txt (full)
         run: terraform show -no-color tfplan.bin | tee plan.txt
 
