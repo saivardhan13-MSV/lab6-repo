@@ -11,14 +11,50 @@ jobs:
     name: Warmup - hello artifact
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      - name: Print SHA
+        run: echo "Commit SHA is $GITHUB_SHA"
       - name: Create hello file
         run: echo "run $GITHUB_RUN_ID" > hello-6837.txt
-
-      - name: Upload warmup artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: hello-6837
           path: hello-6837.txt
+
+  fmt-validate-plan:
+    runs-on: ubuntu-latest
+    needs: warmup
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Terraform FMT (enforce style)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan (save binary)
+        run: terraform plan -no-color -out=tfplan.bin
+
+      - name: Terraform Show → plan.txt (full)
+        run: terraform show -no-color tfplan.bin | tee plan.txt
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tf-plan-6837
+          path: plan.txt
