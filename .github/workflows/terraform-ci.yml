@@ -1,0 +1,24 @@
+name: terraform-ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  warmup:
+    name: Warmup - hello artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create hello file
+        run: echo "run $GITHUB_RUN_ID" > hello-6837.txt
+
+      - name: Upload warmup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-6837
+          path: hello-6837.txt
